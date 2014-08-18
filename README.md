@@ -5,12 +5,12 @@ Is a lightweight commandline tool to filter bibtex files. It was tailored to wor
 It simply allows to filter the entries of a given bibtex file.
 
 Systemrequirements
-==================
+------------------
 
 * Ruby Version 1.9.3 (or higher) [\[get here\]](https://www.ruby-lang.org/de/downloads/)
 
 Synopsis
-========
+--------
 
 ```bash
 ruby bibfilter.rb -cN FILES
@@ -21,7 +21,7 @@ ruby bibfilter.rb -V
 ```
 
 Description
-===========
+-----------
 
  Bibfilter is a simple commandline tool which enables the user to
  either interactively or automatically filter a given bibtex file.
@@ -32,7 +32,7 @@ Description
  removing the rest according to (-r and -e)
 
 Commandline Options
-===================
+-------------------
 
  Argument     | Function
 :------------:|-------------------------------------------------------------------
@@ -51,7 +51,7 @@ Commandline Options
  -V           |Shows the version number.
 
 Usage
-=====
+-----
 The following command will remove all bibtex entries from the **paper2002.bib** file with a citation count below 100 and store the remaining entries into the file **filteredpapers2002.bib**
 
 ```bash

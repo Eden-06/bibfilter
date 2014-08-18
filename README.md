@@ -52,13 +52,13 @@ Commandline Options
 
 Usage
 =====
-The following command will remove all bibtex entries from the paper2002.bib file with a citation count below 100 and store the remaining entries into the file filteredpapers2002.bib
+The following command will remove all bibtex entries from the **paper2002.bib** file with a citation count below 100 and store the remaining entries into the file **filteredpapers2002.bib**
 
 ```bash
 ruby bibfilter.rb -c100 paper2002.bib > filteredpapers2002.bib
 ```
 
-The following invocation will go through all the papers interactivelly and stores the results into the filteredpapers2002.bib
+The following invocation will go through all the papers interactivelly and stores the results into the **filteredpapers2002.bib**
 ```bash
  ruby bibfilter.rb -n paper2002.bib > filteredpapers2002.bib
 ```

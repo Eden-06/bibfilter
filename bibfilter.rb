@@ -1,7 +1,7 @@
 #!/bin/ruby
 # encoding : utf-8
 
-Version="1.0"
+Version="1.1"
 Documentation=<<EOS
 NAME
  bibfilter - allows to filter the entries of a given bibtex file
@@ -227,10 +227,11 @@ predicate=case key
             when "-n"
              lambda {|bib,i,s,r|
                      $stderr.puts "entry: %d of %d (%.2f %%) removed: %d (%.2f %%)" % [i+1,s,(i*100.0)/s,r,(r*100.0)/(i+1)]
-                     $stderr.puts " class: %s"% $1.to_s unless (bib.find{|l| /^\@([a-zA-Z]+)\{/ =~ l }).nil?
-                     $stderr.puts " title: %s"% $1.to_s unless (bib.find{|l| /title.*=.*\{(.+)\}/ =~ l }).nil?
-                     $stderr.puts " url  : %s"% $1.to_s unless (bib.find{|l| /howpublished.*=.*\{\\url\{(.+)\}\}/ =~ l }).nil?
-                     $stderr.puts " cites: %s"% $1.to_s unless (bib.find{|l| /citations=\{([0-9]+)\}/ =~ l }).nil?
+                     $stderr.puts " class  : %s"% $1.to_s unless (bib.find{|l| /^\@([a-zA-Z]+)\{/ =~ l }).nil?
+                     $stderr.puts " title  : %s"% $1.to_s unless (bib.find{|l| /title.*=.*\{(.+)\}/ =~ l }).nil?
+                     $stderr.puts " authors: %s"% $1.to_s unless (bib.find{|l| /author.*=[^{]*\{(.+)\}/ =~ l }).nil?
+                     $stderr.puts " url    : %s"% $1.to_s unless (bib.find{|l| /howpublished.*=.*\{\\url\{(.+)\}\}/ =~ l }).nil?
+                     $stderr.puts " cites  : %s"% $1.to_s unless (bib.find{|l| /citations=\{([0-9]+)\}/ =~ l }).nil?
                      $stderr.print("Remove this entry (y/n) [default no]? ")
                      key=$stdin.gets.strip
                      !(/^[yY].*/ =~ key)

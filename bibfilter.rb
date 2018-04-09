@@ -29,6 +29,15 @@ OPTIONS
        (This method assumes a citations field in each bibtex entry.)
  -d    remove duplicates from the bibtex entries based on their key.
        This option is combinable with every other option.
+ --intersection
+       instead of creating the union of all files, create the intersection of
+       all file, i.e., only add bibtex entries present in all files.
+       This option is combinable with every other option, except difference.
+ --difference
+       instead of creating the union of all files, creates the difference of
+       the first and all files, i.e., only include bibtex entries of the first
+       file not included in any subsequent files.
+       This option is combinable with every other option, except intersection.       
  -aT   Filter the bibitems and retain all items belonging to a certain
        class (i.e.: article, book, incollections).
        This option can be used multiple times but not in combination 
@@ -105,6 +114,8 @@ summary=false
 countfiles=false
 table=false
 removeduplicates=false
+intersection=false
+difference=false
 
 ARGV.each do|x| 
  case x
@@ -112,6 +123,10 @@ ARGV.each do|x|
    key,mincount="-c",$1.to_i
   when /^-d$/
    removeduplicates=true
+  when /^--intersection$/
+   intersection=true
+  when /^--difference$/
+   difference=true
   when /^-a([a-zA-Z]+)$/
    key="-a"
    retain << $1.to_s.downcase
@@ -166,17 +181,41 @@ if key=="-e" and regexp.nil?
   exit(3)
 end
 
+if intersection and difference
+  $stderr.puts "Options --intersection and --difference are mutual exclusive, only use one of them"
+  exit(4)
+end
+
 bibitems=[]
+keysperfile=[]
 files.each do|file|
+	keysperfile << []
   open(file,"r") do|f|
    f.each_line do|line|
     bibitems << []  if /^@.*/ =~ line
     bibitems.last << line.strip unless bibitems.last.nil?
+    keysperfile.last << $1 if /^@.*{(.+),/ =~ line.strip;
    end
   end
 end
 
-$stderr.puts "found %d bibitems"%bibitems.size if verbose
+$stderr.puts "found %d bibitems in %d files"% [bibitems.size,keysperfile.size] if verbose
+
+## compute intersection of all bibitems per file
+if intersection
+  $stderr.puts "Computing intersection"
+  keys=keysperfile.inject(:&)
+  h=bibitems.inject(Hash.new){|h,bib| h[$1]=bib if /^@.*{(.+),/ =~ bib.first  and keys.include?($1); h }
+  bibitems=keys.map{|k| h[k]} #to retain previous order and duplication
+end
+
+## compute difference of all bibitems per file
+if difference
+	$stderr.puts "Computing difference (relative complement)"
+	keys=keysperfile.inject(:-)
+  h=bibitems.inject(Hash.new){|h,bib| h[$1]=bib if /^@.*{(.+),/ =~ bib.first  and keys.include?($1); h }
+  bibitems=keys.map{|k| h[k]} #to retain previous order and duplication
+end
 
 ## remove Duplicates
 if removeduplicates

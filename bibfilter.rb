@@ -1,7 +1,7 @@
 #!/bin/ruby
 # encoding : utf-8
 
-Version="1.1"
+Version="1.2"
 Documentation=<<EOS
 NAME
  bibfilter - allows to filter the entries of a given bibtex file

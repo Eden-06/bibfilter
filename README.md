@@ -47,6 +47,11 @@ Commandline Options
  -n             | Perform an Interactive decission process showing the title, the link and the number of citations (default).
  -h             | Show this document.
  -m             | Measure the entries in the bibtex file to compute the citations min, max, and median as well as the total number of entries. This works also in combination with automatic filters but not with the interactive filter.
+ --size         | only emit the number of bibitems. This option implies -m.
+ --min          | only emit the minimum of the citation count. This option implies -m.
+ --max          | only emit the maximum of the citation count. This option implies -m.
+ --median       | only emit the median of the citation count. This option implies -m.
+ --files        | only emit the number of referenced files. This option implies -m.
  -t             | creates output of measures in the CSV format with count; citations median, min, max. This option implies -m.
  -l             | add the total number of files referenced in the bibtex file to the measured entries. This option implies -m and can be combined with -t.
  -v             | produces verbose output.

@@ -1,7 +1,7 @@
 #!/bin/ruby
 # encoding : utf-8
 
-Version="1.2"
+Version="1.3"
 Documentation=<<EOS
 NAME
  bibfilter - allows to filter the entries of a given bibtex file
@@ -65,6 +65,16 @@ OPTIONS
        min, max, and median as well as the total number of entries.
        This works also in combination with automatic filters but not with
        interactive filter.
+ --size
+       only emit the number of bibitems. This option implies -m.
+ --min 
+       only emit the minimum of the citation count. This option implies -m.
+ --max
+       only emit the maximum of the citation count. This option implies -m.
+ --median
+       only emit the median of the citation count. This option implies -m.
+ --files
+       onlyemit the number of referenced files. This option implies -m.
  -l    add the total number of files referenced in the bibtex file to the
        measured entries. This option implies -m.
  -t    creates output of measures in the CSV format with count;
@@ -101,6 +111,14 @@ def achievements(index,size,removed,l)
  return "[removed]"
 end
 
+# Copied from https://stackoverflow.com/questions/14859120/calculating-median-in-ruby?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
+def median(array)
+	return nil if array.to_a.size <= 0
+  sorted = array.to_a.sort
+  len = sorted.length
+  (sorted[(len-1)/2] + sorted[len/2]) / 2.0
+end
+
 # begin of execution
 key="-n" 
 files=[]
@@ -113,6 +131,7 @@ rexclude=nil
 summary=false
 countfiles=false
 table=false
+onlyemit=nil
 removeduplicates=false
 intersection=false
 difference=false
@@ -127,6 +146,21 @@ ARGV.each do|x|
    intersection=true
   when /^--difference$/
    difference=true
+  when /^--size$/
+   key,summary="-a",true
+   onlyemit=lambda{|c,f| c.size}
+  when /^--min$/
+   key,summary="-a",true
+   onlyemit=lambda {|c,f| if c.size>0 then c.last else 0 end}
+  when /^--max$/
+   key,summary="-a",true
+   onlyemit=lambda {|c,f| if c.size>0 then c.last else 0 end}
+  when /^--median$/
+   key,summary="-a",true
+   onlyemit=lambda {|c,f| median(c)}
+  when /^--files$/
+   key,summary,countfiles="-a",true,true
+   onlyemit=lambda {|c,f| f}
   when /^-a([a-zA-Z]+)$/
    key="-a"
    retain << $1.to_s.downcase
@@ -302,8 +336,6 @@ else
  end
 end
 
-
-
 if summary
   citations=filtered.map do|bib|
     if bib.find{|l| /citations.*=.*\{([0-9]+)\}/ =~ l }.nil?
@@ -317,17 +349,19 @@ if summary
   end
   if table
     a=[citations.size,
-       citations[(citations.size/2)+1],
+       median(citations),
        citations.first,
        citations.last]
     a << filecount if countfiles
     puts (a.map{|x| if x.nil? then 0 else x end}).join(", ")
+  elsif not onlyemit.nil?
+		puts onlyemit.call(citations,filecount)  	
   else
-    puts "size:       %d" % citations.size
-    puts "median:     %d" % citations[citations.size/2+1] if citations.size > 2
-    puts "min:        %d" % citations.first               if citations.size > 1
-    puts "max:        %d" % citations.last                if citations.size > 1
-    puts "file links: %d" % filecount                     if countfiles
+    puts "size:       %d"    % citations.size
+    puts "median:     %0.2f" % median(citations) if citations.size > 1
+    puts "min:        %d"    % citations.first   if citations.size > 1
+    puts "max:        %d"    % citations.last    if citations.size > 1
+    puts "file links: %d"    % filecount         if countfiles
   end
 end
 

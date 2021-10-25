@@ -29,33 +29,38 @@ Description
  whereas the interactive part of the programm uses STDERR for its output.
  Please note that all the automatic filters are executed in a strict 
  order first retaining all bibitems (with -a and -i) and afterwards 
- removing the rest according to (-r and -e)
+ removing the rest according to (-r and -e).
 
 Commandline Options
 -------------------
 
- Argument       | Function
-:--------------:|-------------------------------------------------------------------
- -cN            | Filter the bibitems by citations and remove all entries with less then N citations. (This method assumes a citations field in each bibtex entry.)
- -d             | remove duplicates from the bibtex entries based on their key. This option is combinable with every other option.
- --intersection | instead of creating the union of all files, create the intersection of all file, i.e., only add bibtex entries present in all files. This option is combinable with every other option.
- --difference   | instead of creating the union of all files, creates the difference of the first and all files, i.e., only include bibtex entries of the first file not included in any subsequent files.
- -aT            | Filter the bibitems and retain all items belonging to a certain class (i.e.: article, book, incollections). This option can be used multiple times but not in combination with other options! 
- -rT            | Filter the bibitems and remove all items belonging to a certain class (i.e.: article, book, incollections). This option can be used multiple times but not in combination with other options!
- -e"/REGEX/"    | excludes all bibitems to which this ruby regular expression applies. The expression will be evaluated for each line of a bibfile, so it is impossible evaluate a howl bibitem. This option can be used once, but combined with other automated options like -a, -r, or -i.
- -i"/REGEX/"    | includes all bibitems to which this ruby regular expression applies. The expression will be evaluated for each line of a bibfile, so it is impossible evaluate a howl bibitem. This option can be used once, but combined with other automated options like -a, -r, or -e.
- -n             | Perform an Interactive decission process showing the title, the link and the number of citations (default).
- -h             | Show this document.
- -m             | Measure the entries in the bibtex file to compute the citations min, max, and median as well as the total number of entries. This works also in combination with automatic filters but not with the interactive filter.
- --size         | only emit the number of bibitems. This option implies -m.
- --min          | only emit the minimum of the citation count. This option implies -m.
- --max          | only emit the maximum of the citation count. This option implies -m.
- --median       | only emit the median of the citation count. This option implies -m.
- --files        | only emit the number of referenced files. This option implies -m.
- -t             | creates output of measures in the CSV format with count; citations median, min, max. This option implies -m.
- -l             | add the total number of files referenced in the bibtex file to the measured entries. This option implies -m and can be combined with -t.
- -v             | produces verbose output.
- -V             | Shows the version number.
+ Argument           | Function
+:------------------:|-------------------------------------------------------------------
+ -cN                | Filter the bibitems by citations and remove all entries with less then N citations. (This method assumes a citations field in each bibtex entry.)
+ -d                 | remove duplicates from the bibtex entries based on their key. This option is combinable with every other option.
+ --intersection     | instead of creating the union of all files, create the intersection of all file, i.e., only add bibtex entries present in all files. This option is combinable with every other option.
+ --difference       | instead of creating the union of all files, creates the difference of the first and all files, i.e., only include bibtex entries of the first file not included in any subsequent files.
+ -aT                | Filter the bibitems and retain all items belonging to a certain class (i.e.: article, book, incollections). This option can be used multiple times but not in combination with other options! 
+ -rT                | Filter the bibitems and remove all items belonging to a certain class (i.e.: article, book, incollections). This option can be used multiple times but not in combination with other options!
+ -e"/REGEX/"        | excludes all bibitems to which this ruby regular expression applies. The expression will be evaluated for each line of a bibfile, so it is impossible evaluate a howl bibitem. This option can be used once, but combined with other automated options like -a, -r, or -i.
+ -i"/REGEX/"        | includes all bibitems to which this ruby regular expression applies. The expression will be evaluated for each line of a bibfile, so it is impossible evaluate a howl bibitem. This option can be used once, but combined with other automated options like -a, -r, or -e.
+ -n                 | perform an Interactive decission process showing the title, the link and the number of citations (default).
+ -h                 | show this document.
+ -m                 | Measure the entries in the bibtex file to compute the citations min, max, and median as well as the total number of entries. This works also in combination with automatic filters but not with the interactive filter.
+ --size             | only emit the number of bibitems. This option implies -m.
+ --min              | only emit the minimum of the citation count. This option implies -m.
+ --max              | only emit the maximum of the citation count. This option implies -m.
+ --median           | only emit the median of the citation count. This option implies -m.
+ --files            | only emit the number of referenced files. This option implies -m.
+ -t                 | creates output of measures in the CSV format with count; citations median, min, max. This option implies -m.
+ -l                 | add the total number of files referenced in the bibtex file to the measured entries. This option implies -m and can be combined with -t.
+ -csv               | generates a CSV from the bibtex entries. The default fields to export are "Key, Title, Author". Conflicts with -m.
+ --fields"[FIELD]+" |  Extracts the given set of fields when creating a CSV file. FIELD is a comma seperated list of bibtex fields (case insensitive). This option implies -csv.
+ --sep"SEPERATOR"   | create the CSV using the specified SEPERATOR (default is comma). This option implies -csv.
+ --empty"STRING"    | Shows empty fields as STRING displayed in the CSV output. This option implies -csv.
+ --classes"[PATH]+" | Not implemented yet. This option implies -csv.
+ -v                 | produces verbose output.
+ -V                 | shows the version number.
 
 Usage
 -----

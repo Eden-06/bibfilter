@@ -1,6 +1,8 @@
 #!/bin/ruby
 # encoding : utf-8
 
+require 'csv'
+
 Version="1.3"
 Documentation=<<EOS
 NAME
@@ -79,6 +81,18 @@ OPTIONS
        measured entries. This option implies -m.
  -t    creates output of measures in the CSV format with count;
        citations median, min, max. This option implies -m.
+ -csv  generates a CSV from the bibtex entries. The default fields to export are
+       "Key, Title, Author".
+ --fields"[Field]+"
+       Extracts the given set of fields when creating a CSV file. Field is a 
+       comma seperated list of bibtex fields (case insensitive). 
+       This option implies -csv.
+ --sepSEPERATOR
+       create the CSV using the specified SEPERATOR. This option implies -csv.
+ --empty"STRING"
+       shows empty fields as STRING displayed in the CSV output. This option implies -csv.
+ --classes"[Path+]"
+       Not implemented yet. This option implies -csv.       
  -v    produces verbose output.
  -V    Shows the version number.
 
@@ -135,6 +149,11 @@ onlyemit=nil
 removeduplicates=false
 intersection=false
 difference=false
+# Parameters for CSV output
+csvexport=false
+fields=["Key","Author","Title"]
+emptyField="None"
+seperator=","
 
 ARGV.each do|x| 
  case x
@@ -186,6 +205,15 @@ ARGV.each do|x|
    summary=true
    table=true
    key="-a"
+  when /^-csv$/
+    csvexport=true;
+    key="-a"
+  when /^--sep(.+)$/
+    seperator=$1
+  when /^--empty(.*)$/
+    emptyField=$1.strip    
+  when /^--fields([a-zA-Z,]+)$/
+    fields=$1.strip.split(",").map{|f| f.strip}
   when /^-v$/
    verbose=true
   else
@@ -217,6 +245,11 @@ end
 
 if intersection and difference
   $stderr.puts "Options --intersection and --difference are mutual exclusive, only use one of them"
+  exit(4)
+end
+
+if summary and csvexport
+  $stderr.puts "Options -m measure and -csv are mutual exclusive, only use one of them"
   exit(4)
 end
 
@@ -332,7 +365,7 @@ if key=="-n" and (not predicate.nil?)
 else
  unless predicate.nil?
   filtered=bibitems.select(&predicate)
-  filtered.each{|x| puts x} unless summary
+  filtered.each{|x| puts x} unless summary or csvexport
  end
 end
 
@@ -365,5 +398,37 @@ if summary
   end
 end
 
+if csvexport
+  result=CSV.generate("",col_sep: seperator) do |csv|
+    $stderr.puts "export csv"
+    csv << fields
+    fieldMatcher=fields.map do|f|
+      s=f.strip.downcase
+      [s,Regexp.new(s+".*=[^{]*[\{\"](.*)[\}\"][,]?$")]
+    end
+    filtered.each do|bib|
+      row=[]
+      fieldMatcher.each do|field,fieldreg|
+        if field=="key"
+          if bib.find{|l| /^@.*{(.+),/ =~ l }
+            row << $1.to_s.strip
+          else
+            $stderr.puts "[ERROR]: Could not find bibkey in:"
+            $stderr.puts bib
+            row << emptyField
+          end
+        else
+          if bib.find{|l| fieldreg =~ l }
+            row << $1.to_s.strip
+          else 
+            row << emptyField
+          end
+        end
+      end
+      csv << row
+    end
+  end
+  puts result
+end
 
 

@@ -55,10 +55,10 @@ Commandline Options
  -t                 | creates output of measures in the CSV format with count; citations median, min, max. This option implies -m.
  -l                 | add the total number of files referenced in the bibtex file to the measured entries. This option implies -m and can be combined with -t.
  -csv               | generates a CSV from the bibtex entries. The default fields to export are "Key, Title, Author". Conflicts with -m.
- --fields"[FIELD]+" |  Extracts the given set of fields when creating a CSV file. FIELD is a comma seperated list of bibtex fields (case insensitive). This option implies -csv.
- --sep"SEPERATOR"   | create the CSV using the specified SEPERATOR (default is comma). This option implies -csv.
- --empty"STRING"    | Shows empty fields as STRING displayed in the CSV output. This option implies -csv.
- --classes"[PATH]+" | Not implemented yet. This option implies -csv.
+ --fields"[FIELD]+" |  Extracts the given set of fields when creating a CSV file. FIELD is a comma separated list of bibtex fields (case insensitive). This option implies -csv.
+ --sep"SEPERATOR"   | create the CSV using the specified SEPERATOR (default is semi colon). This option implies -csv.
+ --empty"STRING"    | shows empty fields as STRING displayed in the CSV output. This option implies -csv.
+ --classes"[PATH]+" | extract the entries from a classification stored in the classes attribute. PATH is a comma separated list of path expressions with dot, e.g., `Meta Data.Kind`. If the PATH leads to a complex structure, it is flattened and emitted as a comma separated list. This option implies -csv.
  -v                 | produces verbose output.
  -V                 | shows the version number.
 

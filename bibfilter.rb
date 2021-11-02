@@ -85,14 +85,16 @@ OPTIONS
        "Key, Title, Author".
  --fields"[Field]+"
        Extracts the given set of fields when creating a CSV file. Field is a 
-       comma seperated list of bibtex fields (case insensitive). 
+       comma separated list of bibtex fields (case insensitive). 
        This option implies -csv.
- --sepSEPERATOR
-       create the CSV using the specified SEPERATOR. This option implies -csv.
+ --sepSEPARATOR
+       create the CSV using the specified SEPARATOR (default is semi colon). This option implies -csv.
  --empty"STRING"
        shows empty fields as STRING displayed in the CSV output. This option implies -csv.
  --classes"[Path+]"
-       Not implemented yet. This option implies -csv.       
+       extract the entries from a classification stored in the classes 
+       attribute. PATH is a comma separated list of path expressions with dot,
+       e.g., `Meta Data.Kind`. This option implies -csv.     
  -v    produces verbose output.
  -V    Shows the version number.
 
@@ -133,6 +135,44 @@ def median(array)
   (sorted[(len-1)/2] + sorted[len/2]) / 2.0
 end
 
+Scanner=/([,}]|[^{},]+[{]|[^{},]+)/
+
+def parse(classification)
+  token=classification.scan(Scanner)
+  result=Array.new
+  stack=[result]
+  token.each do|t|
+    case t.first
+    when ","
+    when /([^},]+)[{]/
+      new=[$1.strip]
+      stack.last << new
+      stack.push(new)
+    when "}"
+      stack.pop
+    else
+      stack.last << t.first.strip
+    end
+  end
+  $stderr.puts "[ERROR]: Could not completly parse classification. May missing }." if stack.size>1
+  result
+end
+
+def extractByPath(classes,path,empty)
+  classification=parse(classes)
+  ps=path.split(".").map{|p| p.strip}
+  c=classification
+  ps.each do |p|
+    c=c.assoc(p)
+    break if c.nil?
+  end
+  if c.nil?
+    empty
+  else
+    c[1..-1].flatten.join(",")
+  end
+end
+
 # begin of execution
 key="-n" 
 files=[]
@@ -153,7 +193,8 @@ difference=false
 csvexport=false
 fields=["Key","Author","Title"]
 emptyField="None"
-seperator=","
+seperator=";"
+classes=[]
 
 ARGV.each do|x| 
  case x
@@ -214,6 +255,8 @@ ARGV.each do|x|
     emptyField=$1.strip    
   when /^--fields([a-zA-Z,]+)$/
     fields=$1.strip.split(",").map{|f| f.strip}
+  when /^--classes([a-zA-Z,. ]+)$/
+    classes=$1.strip.split(",").map{|f| f.strip}  
   when /^-v$/
    verbose=true
   else
@@ -401,7 +444,7 @@ end
 if csvexport
   result=CSV.generate("",col_sep: seperator) do |csv|
     $stderr.puts "export csv"
-    csv << fields
+    csv << fields+classes
     fieldMatcher=fields.map do|f|
       s=f.strip.downcase
       [s,Regexp.new(s+".*=[^{]*[\{\"](.*)[\}\"][,]?$")]
@@ -423,6 +466,12 @@ if csvexport
           else 
             row << emptyField
           end
+        end
+      end
+      if bib.find{|l| /classes.*=[^{]*\{(.*)\}[,]?$/ =~ l }
+        clazz=$1.strip
+        classes.each do|path|
+          row << extractByPath(clazz,path,emptyField)
         end
       end
       csv << row
